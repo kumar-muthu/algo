@@ -2,50 +2,96 @@
 class TicTakToe {
     board;
     public constructor(private n: number) {
-        this.board = Array(n * n).fill('-');
+        this.board = []
+        for (let i = 0; i < n; i++) {
+            this.board.push(Array(n).fill('-'))
+        }
     }
 
-    public move(player: any, position: any) {
-        const x = position[0] * this.n + position[1];
-        if (this.board[x] != '-') {
+    public move(player: any, x: any, y: any) {
+        if (this.board[x][y] != '-') {
             return;
         }
-        this.board[x] = player;
+        this.board[x][y] = player;
     }
 
-    public isRow(row) {
-        let i = row * this.n;
-        let x = this.board[i];
-        i++;
-        while (i < (row + 1) * this.n) {
-            if(x !== this.board[i] || this.board[i] === '-') {
-                return false;
-            }
-            i++;
+    public hasWon(char) {
+        if (this.hasColumns(char) || this.hasRows(char) || this.hasLeftDiagonal(char) || this.hasRightDiagonal(char)) {
+            return true;
         }
-        return true;
+        return false;
+    }
+
+    public hasColumns(char) {
+        // columns
+        for (let i = 0; i < this.board.length; i++) {
+            let charCount = 0;
+            for (let j = 0; j < this.board.length; j++) {
+                if (this.board[j][i] === char) {
+                    charCount++;
+                }
+            }
+            if (charCount === this.board.length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public hasRows(char) {
+        // columns
+        for (let i = 0; i < this.board.length; i++) {
+            let charCount = 0;
+            for (let j = 0; j < this.board.length; j++) {
+                if (this.board[i][j] === char) {
+                    charCount++;
+                }
+            }
+            if (charCount === this.board.length) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public hasLeftDiagonal(char) {
+
+        let charCount = 0;
+        for (let i = 0; i < this.board.length; i++) {
+            if (this.board[i][i] === char) {
+                charCount++;
+            }
+        }
+        if (charCount === this.board.length) {
+            return true;
+        }
+        return false;
+    }
+
+    public hasRightDiagonal(char) {
+        let charCount = 0;
+        for (let i = 0; i < this.board.length; i++) {
+            if (this.board[i][this.board.length - 1 - i] === char) {
+                charCount++;
+            }
+        }
+        if (charCount === this.board.length) {
+            return true;
+        }
+        return false;
     }
 
     public print() {
-        let i = 0;
-        let str = '';
-        while (i < this.board.length) {
-            str = str.concat(this.board[i]);
-            if ((i + 1) % this.n === 0) {
-                console.log(str);
-                str = '';
-            }
-            i++;
-        }
-
+        console.log(this.board);
     }
 }
 
-const game = new TicTakToe(3);
-game.move('X', [1, 1]);
-game.move('X', [1, 2]);
-game.move('X', [1, 0]);
-console.log(game.isRow(0));
-console.log(game.isRow(1));
+const game = new TicTakToe(5);
+game.move('X', 0, 4);
+game.move('X', 1, 3);
+game.move('X', 2, 2);
+game.move('X', 3, 1);
+game.move('X', 4, 4);
 
+console.log(game.hasWon('X'));
 game.print();
