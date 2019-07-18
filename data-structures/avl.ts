@@ -42,7 +42,7 @@ class AVL {
         } else {
             return current;
         }
-         
+
     }
 
     rotate(current: NodeItem) {
@@ -65,7 +65,7 @@ class AVL {
         const pivot = root.right;
         pivot.parent = root.parent;
         if (root.parent) {
-            if(root.parent.left && root.parent.left.value === root.value) {
+            if (root.parent.left && root.parent.left.value === root.value) {
                 root.parent.left = pivot;
             } else {
                 root.parent.right = pivot;
@@ -85,7 +85,7 @@ class AVL {
         const pivot = root.left;
         pivot.parent = root.parent;
         if (root.parent) {
-            if(root.parent.left && root.parent.left.value === root.value) {
+            if (root.parent.left && root.parent.left.value === root.value) {
                 root.parent.left = pivot;
             } else {
                 root.parent.right = pivot;
@@ -142,7 +142,7 @@ class AVL {
     }
 
     print() {
-        this.inorder(this.root);
+        this.levelOrder(this.root);
     }
 
     private inorder(node: NodeItem) {
@@ -151,6 +151,180 @@ class AVL {
             console.log(node.value);
             this.inorder(node.right);
         }
+    }
+
+    private levelOrder(node: NodeItem) {
+        const q: any = [];
+        q.push(node);
+
+        while (true) {
+            const l = q.length;
+            if (l <= 0) {
+                break;
+            }
+
+            const levels: any = []
+            for (let i = 0; i < l; i++) {
+                const n = q.shift();
+                levels.push(n.value);
+                if (n.left) {
+                    q.push(n.left);
+                }
+                if (n.right) {
+                    q.push(n.right);
+                }
+            }
+
+            console.log(levels.join(' '))
+        }
+    }
+
+    private maxDepth(node: NodeItem) {
+        if (!node) {
+            return 0;
+        }
+        return Math.max(this.maxDepth(node.right), this.maxDepth(node.left)) + 1;
+    }
+
+    private minDepth(node: NodeItem) {
+        if (!node) {
+            return 0;
+        }
+        return Math.min(this.minDepth(node.right), this.minDepth(node.left)) + 1;
+    }
+
+    isBalanced() {
+        const balance = this.maxDepth(this.root) - this.minDepth(this.root);
+        return balance > 1 ? false : true;
+    }
+
+    successor(node) {
+        if (!node) {
+            return false
+        }
+
+        if (node.right !== null) {
+            return this.leftMostChild(node.right);
+        } else {
+            let p = node.parent;
+            while (p) {
+                if (p.parent.left.value == p.value) {
+                    return p.parent;
+                }
+                p = p.parent;
+            }
+            return false;
+        }
+    }
+
+    leftMostChild(current) {
+        let node = current
+        while (node.left !== null) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    get(value) {
+        return this.search(this.root, value)
+    }
+
+    search(node, value) {
+        if (!node) {
+            return false;
+        }
+        if (node.value === value) {
+            return node
+        } else {
+            return this.search(node.left, value) || this.search(node.right, value);
+        }
+    }
+
+    find_lca(x, y) {
+        return this.lca(this.root, x, y);
+    }
+    private lca(node, x, y) {
+        if (!node) {
+            return false;
+        }
+        if (node.value === x || node.value === y) {
+            return node;
+        }
+
+        const isLeft = this.lca(node.left, x, y);
+        const isRight = this.lca(node.right, x, y);
+
+        if (isLeft && isRight) {
+            return node
+        } else {
+            return isLeft || isRight
+        }
+    }
+
+    subTree(t) {
+        return this.containsTree(this.root, t);
+    }
+
+    containsTree(t1, t2) {
+        if (t1 === null || t2 === null) {
+            return false;
+        }
+        if (t1.value === t2.value) {
+            if (this.checkSubTree(t1, t2)) {
+                return true;
+            }
+        } else {
+            return this.containsTree(t1.left, t2) ||
+                this.containsTree(t1.right, t2);
+        }
+    }
+
+    checkSubTree(t1, t2) {
+        if (!t2) {
+            return true;
+        }
+
+        if (!t1) {
+            return false;
+        }
+        if (t1.value !== t2.value) {
+            return false;
+        }
+
+        return (this.checkSubTree(t1.left, t2.left) && this.checkSubTree(t1.right, t2.right))
+    }
+
+    pathSum(sum) {
+        const arr = []
+        const result = this.preOrder(this.root, arr, sum)
+        console.log(result);
+    }
+
+    private preOrder = (node, arr, sum) => {
+        let current_path_counts = 0;
+        if (node && node.value) {
+            arr.push(node.value)
+            current_path_counts = this.findPathCounts(arr, sum);
+            if(!node.left && !node.right) {
+                console.log(arr);
+            } else {
+                current_path_counts += this.preOrder(node.left, [...arr], sum)
+                current_path_counts += this.preOrder(node.right, [...arr], sum)
+            }
+        }
+        return current_path_counts
+    }
+
+    private findPathCounts(arr, expectedSum) {
+        let sum = 0;
+        let count = 0;
+        for (let i = arr.length - 1; i >=0 ; i--) {
+           sum += arr[i];
+            if(sum === expectedSum){
+                count++;
+            }
+        }
+        return count;
     }
 }
 
@@ -188,4 +362,23 @@ tree.insert(2);
 
 
 tree.print();
-console.log(tree.balanceFactor(tree.root));
+// console.log(tree.balanceFactor(tree.root));
+// tree.print();
+//const five = tree.get(5);
+
+
+//                          9
+//              6 				         13
+//          4 	    	  7	   		11	    	15
+//      2     5    	    8        10   12     14         16
+//  1  3                                                    17
+// console.log(tree.find_lca(5, 8))
+// console.log(tree.isBalanced());
+// const t2 = new AVL();
+// t2.insert(6);
+// t2.insert(4);
+// t2.insert(7);
+// t2.print();
+
+// console.log(tree.subTree(t2.root));
+tree.pathSum(9)
