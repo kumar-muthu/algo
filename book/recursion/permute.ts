@@ -7,10 +7,10 @@ const permute = (str, r, f) => {
         return;
     }
     for (let index = 0; index < str.length; index++) {
-        const element = str[index]; //a
-        const temp = [...str];
-        temp.splice(index, 1) // bc
-        const t = [...r, element]
+        const element = str[index]; // take one char - 'a'
+        const temp = [...str]; // copy
+        temp.splice(index, 1) // remove that char from copy - 'a'
+        const t = [...r, element] // add 'a'
         permute(temp.join(''), t, f) 
     }
     return f
